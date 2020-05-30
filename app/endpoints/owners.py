@@ -107,11 +107,6 @@ def generate_test_data(db: Session = Depends(get_db)):
     return owners.test_data(db=db)
 
 
-@router.post("/reset_index/")
-def reset_owner_index(db: Session = Depends(get_db)):
-    return owners.reset_index(db=db)
-
-
 def field_validation(owner: owner.Owner, db: Session = Depends(get_db)):
     db_owner_username = owners.get_owner_by_username(
         db=db, username=owner.username)

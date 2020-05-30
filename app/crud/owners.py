@@ -79,14 +79,6 @@ def delete_all_owners(db: Session):
     return {'message': message}
 
 
-def reset_index(db: Session):
-    db.execute('ALTER SEQUENCE owners_id_seq RESTART;')
-    db.execute("UPDATE owners SET id = DEFAULT;")
-    db.commit()
-    message = 'Index reset successfully'
-    return {'message': message}
-
-
 def test_data(db: Session):
     db_owner = models.Owner(
         name='juan',
