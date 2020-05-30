@@ -9,7 +9,7 @@ class BasePet(BaseModel):
     is_adopted: Optional[bool]
     age: Optional[int]
     weight: Optional[float]
-    #owner_id: int
+    owner_id: int
 
     class Config:
         orm_mode = True

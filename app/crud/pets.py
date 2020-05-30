@@ -10,24 +10,32 @@ def get_all_pets(db: Session):
     return db.query(models.Pet).all()
 
 
-def get_pet_by_name(db: Session, pet_name: str):
-    return db.query(models.Pet).filter(models.Pet.name == pet_name).all()
+def get_pet_by_name(db: Session, name: str):
+    return db.query(models.Pet).filter(models.Pet.name == name).all()
 
 
-def get_pet_by_id(db: Session, pet_id: int):
-    return db.query(models.Pet).filter(models.Pet.id == pet_id).first()
+def get_pet_by_id(db: Session, id: int):
+    return db.query(models.Pet).filter(models.Pet.id == id).first()
 
 
 def get_adopted_pets(db: Session):
     return db.query(models.Pet).filter(models.Pet.is_adopted == True).all()
 
 
-def get_pets_type(db: Session, pet_type: str):
-    return db.query(models.Pet).filter(models.Pet.pet_type == pet_type).all()
+def get_pets_type(db: Session, p_type: str):
+    return db.query(models.Pet).filter(models.Pet.pet_type == p_type).all()
 
 
-def update_pet(db: Session, pet: pet.UpdatePet, pet_id: int):
-    update_pet = db.query(models.Pet).filter(models.Pet.id == pet_id).first()
+def get_pet_owner(db: Session, id: int):
+    pet_owner = db.query(models.Pet).filter(models.Pet.id == id).first()
+    if not pet_owner:
+        return None
+
+    return (db.query(models.Pet).filter(models.Pet.id == id).first()).owner 
+
+
+def update_pet(db: Session, pet: pet.UpdatePet, id: int):
+    update_pet = db.query(models.Pet).filter(models.Pet.id == id).first()
     if (update_pet):
         update_pet.name = pet.name
         update_pet.update_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -39,33 +47,33 @@ def update_pet(db: Session, pet: pet.UpdatePet, pet_id: int):
         update_pet.weight = pet.weight
         db.commit()
 
-        message = f'Dog with id {pet_id} and named {update_pet.name} was successfully updated'
+        message = f'Dog with id {id} and named {update_pet.name} was successfully updated'
         return {'message': message}
 
     return None
 
 
-def insert_pet(db: Session, pet: pet.BasePet, pet_name: str):
+def insert_pet(db: Session, pet: pet.BasePet, name: str):
     standarized_type = pet.pet_type.lower()
     picture = get_pet_image(standarized_type)
     create_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
     update_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    db_pet = models.Pet(name=pet_name, picture=picture,
+    db_pet = models.Pet(name=name, picture=picture,
                         create_date=create_date, update_date=update_date, **pet.dict())
     db.add(db_pet)
     db.commit()
     db.refresh(db_pet)
-    message = f'{pet_name} was successfully added'
+    message = f'{name} was successfully added'
     return {'message': message, 'data': db_pet}
 
 
-def delete_pet(db: Session, pet_id: int):
-    pet_deleted = db.query(models.Pet).filter(models.Pet.id == pet_id).delete()
+def delete_pet(db: Session, id: int):
+    pet_deleted = db.query(models.Pet).filter(models.Pet.id == id).delete()
     if (pet_deleted != 0):
         db.commit()
-        message = f'Pet with id {pet_id} was successfully deleted'
+        message = f'Pet with id {id} was successfully deleted'
         return {'message': message}
-    message = f'Pet with id {pet_id} not found'
+    message = f'Pet with id {id} not found'
     return {'message': message}
 
 
@@ -108,8 +116,8 @@ def test_data(db: Session):
         update_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
         is_adopted=True,
         age=10,
-        weight=9.3
-        #owner_id=1
+        weight=9.3,
+        owner_id=1
     )
     db.add(db_pet)
     db_pet = models.Pet(
@@ -121,8 +129,8 @@ def test_data(db: Session):
         update_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
         is_adopted=False,
         age=8,
-        weight=5.5
-        #owner_id=1
+        weight=5.5,
+        owner_id=1
     )
     db.add(db_pet)
     db_pet = models.Pet(
@@ -134,8 +142,8 @@ def test_data(db: Session):
         update_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
         is_adopted=False,
         age=7,
-        weight=6.2
-        #owner_id=2
+        weight=6.2,
+        owner_id=2
     )
     db.add(db_pet)
     db.commit()

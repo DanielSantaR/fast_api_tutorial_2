@@ -10,16 +10,20 @@ def get_all_owners(db: Session):
     return db.query(models.Owner).all()
 
 
-def get_owner_by_username(db: Session, owner_username: str):
-    return db.query(models.Owner).filter(models.Owner.username == owner_username).first()
+def get_owner_by_username(db: Session, username: str):
+    return db.query(models.Owner).filter(models.Owner.username == username).first()
 
 
-def get_owner_by_id(db: Session, owner_id: int):
-    return db.query(models.Owner).filter(models.Owner.id == owner_id).first()
+def get_owner_by_id(db: Session, id: int):
+    return db.query(models.Owner).filter(models.Owner.id == id).first()
 
 
-def get_owner_by_email(db: Session, owner_email: str):
-    return db.query(models.Owner).filter(models.Owner.email == owner_email).first()
+def get_owner_by_email(db: Session, email: str):
+    return db.query(models.Owner).filter(models.Owner.email == email).first()
+
+
+def get_owner_pets(db: Session, id: int):
+    return (db.query(models.Owner).filter(models.Owner.id == id).first()).pets
 
 
 def insert_owner(db: Session, owner: owner.Owner):
@@ -32,9 +36,9 @@ def insert_owner(db: Session, owner: owner.Owner):
     return {'message': message, 'data': db_owner}
 
 
-def update_owner(db: Session, owner: owner.OwnerOut, owner_id: int):
+def update_owner(db: Session, owner: owner.OwnerOut, id: int):
     update_owner = db.query(models.Owner).filter(
-        models.Owner.id == owner_id).first()
+        models.Owner.id == id).first()
     if (update_owner):
         update_owner.name = owner.name
         update_owner.surname = owner.surname
@@ -43,38 +47,38 @@ def update_owner(db: Session, owner: owner.OwnerOut, owner_id: int):
         update_owner.password = owner.password
         db.commit()
 
-        message = f'Owner with id {owner_id} and named {update_owner.name} was successfully updated'
+        message = f'Owner with id {id} and named {update_owner.name} was successfully updated'
         return {'message': message}
 
     return None
 
 
-def delete_owner_by_id(db: Session, owner_id: int):
+def delete_owner_by_id(db: Session, id: int):
     owner_deleted = db.query(models.Owner).filter(
-        models.Owner.id == owner_id).delete()
+        models.Owner.id == id).delete()
     if (owner_deleted != 0):
         db.commit()
-        message = f'owner with id {owner_id} was successfully deleted'
+        message = f'owner with id {id} and his dogs were successfully deleted'
         return {'message': message}
-    message = f'owner with id {owner_id} not found'
+    message = f'owner with id {id} not found'
     return {'message': message}
 
 
-def delete_owner_by_username(db: Session, owner_username: int):
+def delete_owner_by_username(db: Session, username: int):
     owner_deleted = db.query(models.Owner).filter(
-        models.Owner.username == owner_username).delete()
+        models.Owner.username == username).delete()
     if (owner_deleted != 0):
         db.commit()
-        message = f'owner with username {owner_username} was successfully deleted'
+        message = f'owner with username {username} and his dogs were successfully deleted'
         return {'message': message}
-    message = f'owner with username {owner_username} not found'
+    message = f'owner with username {username} not found'
     return {'message': message}
 
 
 def delete_all_owners(db: Session):
     db.query(models.Owner).delete()
     db.commit()
-    message = 'All owners deleted successfully'
+    message = 'All owners and dogs deleted successfully'
     return {'message': message}
 
 

@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy_utils import EmailType
 from db.database import Base
 import datetime
@@ -14,10 +14,6 @@ class Owner(Base):
     username = Column(String, unique=True)
     password = Column(String)
     email = Column(EmailType, unique=True)
-
-    #pet_id = Column(Integer, ForeignKey("pets.id"))
-
-    #pets = relationship("Pet", back_populates="owner")
 
 
 class Pet(Base):
@@ -34,6 +30,6 @@ class Pet(Base):
     age = Column(Integer)
     weight = Column(Integer)
 
-    #owner_id = Column(Integer, ForeignKey("owners.id"))
-
-    #owner = relationship("Owner", back_populates="pets")
+    owner_id = Column(Integer, ForeignKey('owners.id', ondelete='CASCADE'))
+    owner = relationship('Owner', backref=backref(
+        'pets', passive_deletes=True))

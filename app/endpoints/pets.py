@@ -2,9 +2,9 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
-from app.crud import pets
+from app.crud import owners, pets
 from app.models import models
-from app.schemas import pet
+from app.schemas import owner, pet
 from db.database import SessionLocal, engine
 
 
@@ -21,7 +21,7 @@ def get_db():
         db.close()
 
 
-@router.get("/pets", response_model=List[pet.Pet])
+@router.get("/all/", response_model=List[pet.Pet])
 def get_all_pets(db: Session = Depends(get_db)):
     db_pets = pets.get_all_pets(db=db)
     if not db_pets:
@@ -41,12 +41,12 @@ def get_pet_by_name(name: str = Path(..., min_length=2), db: Session = Depends(g
     return db_pet_name
 
 
-@router.get("/id/{pet_id}", response_model=pet.Pet)
-def get_pet_by_id(pet_id: int = Path(..., ge=1), db: Session = Depends(get_db)):
-    db_pet_id = pets.get_pet_by_id(db=db, pet_id=pet_id)
+@router.get("/id/{id}", response_model=pet.Pet)
+def get_pet_by_id(id: int = Path(..., ge=1), db: Session = Depends(get_db)):
+    db_pet_id = pets.get_pet_by_id(db=db, id=id)
     if db_pet_id is None:
         raise HTTPException(
-            status_code=404, detail=f"Pet with id {pet_id} not found"
+            status_code=404, detail=f"Pet with id {id} not found"
         )
     return db_pet_id
 
@@ -61,24 +61,39 @@ def get_adopted_pets(db: Session = Depends(get_db)):
     return db_adopted_pet
 
 
-@router.get("/pet_type/{pet_type}", response_model=List[pet.Pet])
-def get_pets_by_type(pet_type: str, db: Session = Depends(get_db)):
-    db_pets = pets.get_pets_type(db=db, pet_type=pet_type)
+@router.get("/pet_type/{p_type}", response_model=List[pet.Pet])
+def get_pets_by_type(p_type: str, db: Session = Depends(get_db)):
+    db_pets = pets.get_pets_type(db=db, p_type=p_type)
     if not db_pets:
         raise HTTPException(
-            status_code=404, detail=f"No {pet_type}s found"
+            status_code=404, detail=f"No {p_type}s found"
         )
     return db_pets
 
 
+@router.get("/owner/{id}", response_model=owner.OwnerOut)
+def get_pet_owner(id: int = Path(..., ge=1), db: Session = Depends(get_db)):
+    db_pet_owner = pets.get_pet_owner(db=db, id=id)
+    if db_pet_owner is None:
+        raise HTTPException(
+            status_code=404, detail=f"Pet with id {id} not found"
+        )
+    return db_pet_owner
+
+
 @router.post("/insert/{name}")
 def insert_pet(pet: pet.BasePet, name: str = Path(..., min_length=2), db: Session = Depends(get_db)):
-    return pets.insert_pet(db=db, pet=pet, pet_name=name)
+    pet_owner = owners.get_owner_by_id(db=db, id=pet.owner_id)
+    if pet_owner is None:
+        raise HTTPException(
+            status_code=404, detail=f"Owner with id {pet.owner_id} not found"
+        )
+    return pets.insert_pet(db=db, pet=pet, name=name)
 
 
-@router.delete("/{pet_id}")
-def delete_pet(pet_id: int = Path(..., ge=1), db: Session = Depends(get_db)):
-    return pets.delete_pet(db=db, pet_id=pet_id)
+@router.delete("/{id}")
+def delete_pet(id: int = Path(..., ge=1), db: Session = Depends(get_db)):
+    return pets.delete_pet(db=db, id=id)
 
 
 @router.delete("/delete_all/")
@@ -86,12 +101,12 @@ def delete_all(db: Session = Depends(get_db)):
     return pets.delete_all_pets(db=db)
 
 
-@router.put("/update/{pet_id}")
-def update_pet(pet: pet.UpdatePet, pet_id: int = Path(..., ge=1), db: Session = Depends(get_db)):
-    db_pet_id = pets.update_pet(db=db, pet=pet, pet_id=pet_id)
+@router.put("/update/{id}")
+def update_pet(pet: pet.UpdatePet, id: int = Path(..., ge=1), db: Session = Depends(get_db)):
+    db_pet_id = pets.update_pet(db=db, pet=pet, id=id)
     if db_pet_id is None:
         raise HTTPException(
-            status_code=404, detail=f"Pet with id {pet_id} not found"
+            status_code=404, detail=f"Pet with id {id} not found"
         )
     return db_pet_id
 
