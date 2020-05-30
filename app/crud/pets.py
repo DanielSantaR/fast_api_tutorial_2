@@ -47,7 +47,7 @@ def update_pet(db: Session, pet: pet.UpdatePet, id: int):
         update_pet.weight = pet.weight
         db.commit()
 
-        message = f'Dog with id {id} and named {update_pet.name} was successfully updated'
+        message = f'Pet with id {id} and named {update_pet.name} was successfully updated'
         return {'message': message}
 
     return None

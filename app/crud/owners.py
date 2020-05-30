@@ -2,9 +2,6 @@ from sqlalchemy.orm import Session
 from app.models import models
 from app.schemas import owner
 
-from datetime import datetime
-import requests
-
 
 def get_all_owners(db: Session):
     return db.query(models.Owner).all()
