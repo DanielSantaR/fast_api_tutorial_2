@@ -12,7 +12,7 @@ to download the official postgres image from dockerhub.
 I created this path `/home/daniel/postgresVolumes/postgres12`.
 3. To create a new docker container run: `$docker run -p 5432:5432 --name postgres12 -v /home/daniel/postgresVolumes/postgres12:/var/lib/postgresql/data -e   POSTGRES_USER=daniel -e POSTGRES_PASSWORD=root -d postgres`. You can change the user and the password but you have to change it in the environment variables config of the project too.
 4. To enter the container run: `$docker exec -it postgres12 psql -U daniel`. Remember to change the user for the one you have chosen.
-5. To create the database run: `#CREATE DATABASE db_guane_intern_fastapi;`. In the same way, you can put any name, you just have to change it in the environment variables of the project.
+5. To create the database run: `#CREATE DATABASE db_tutorial_fastapi;`. In the same way, you can put any name, you just have to change it in the environment variables of the project.
 
 That is all :)
 
