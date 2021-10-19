@@ -7,6 +7,7 @@ from app.core import config
 import uvicorn
 
 app = FastAPI(title=config.PROJECT_NAME,
+              description="Tutorial",
               openapi_url=f"/api/openapi.json")
 
 # CORS
